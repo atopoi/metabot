@@ -1,0 +1,117 @@
+<html>
+<!--
+Copyright 2019 Nu Echo Inc.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Metabot</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
+  <!-- vue -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <!-- Buefy CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+  <!-- Buefy JavaScript -->
+  <script src="https://unpkg.com/buefy"></script>
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+  <script type="text/x-template" id="chat-box-template">
+    <div :class="['chat-box', {'hide-message-keys' : !showMessageKeys}]">
+     <div class="chat-box-header">
+      <nav class="level">
+        <div class="level-left">
+          <img class="level-item" :src='icon' style="height: 30px;"/>
+          <h3 class="level-item subtitle">{{title}}</h3>
+        </div>
+        <div class="level-right" style="height: 30px;">
+          <!--
+          <a class="level-item is-small chat-box-menu" @click="saveConversation()" title="save conversation"><i class="fas fa-save"/></a>
+          <a class="level-item is-small chat-box-menu" @click="reportBug()" title="Report bug"><i class="fas fa-bug"/></a>
+          -->
+          <a class="level-item is-small" @click="startOrStop()">
+            <i class="far fa-play-circle" v-if="!conversationStarted" />
+            <i class="far fa-stop-circle" v-if="conversationStarted" />
+          </a>
+          <a class="level-item is-small chat-box-menu" @click="toggleDebug()">
+            <i class="far fa-eye" v-if="debug.show"/>
+            <i class="far fa-eye-slash" v-if="!debug.show"/>
+          </a>
+          <b-dropdown class="level-item" position="is-bottom-left" hoverable>
+            <a class="chat-box-menu" slot="trigger"><i class="fas fa-ellipsis-v"/></a>
+            <b-dropdown-item>
+              Debug options
+            </b-dropdown-item>
+            <hr class="dropdown-divider">
+            <b-dropdown-item has-link>
+              <a @click.prevent="showMessageKeys=!showMessageKeys">
+                {{ showMessageKeys ? 'Hide' : 'Show' }} message keys
+              </a>
+            </b-dropdown-item>
+            <b-dropdown-item has-link>
+              <a @click.stop="showControlEvents=!showControlEvents">
+                {{ showControlEvents ? 'Hide' : 'Show' }} control events
+              </a>
+            </b-dropdown-item>
+            <hr class="dropdown-divider">
+            <b-dropdown-item has-link>
+              <a @click.stop="debug.focus.show=!debug.focus.show">
+                 {{ debug.focus.show ? 'Hide' : 'Show' }} focus events
+              </a>
+            </b-dropdown-item>
+            <b-dropdown-item has-link>
+              <a @click.prevent="debug.reactor.show=!debug.reactor.show">
+                {{ debug.reactor.show ? 'Hide' : 'Show' }} reactor events
+              </a>
+            </b-dropdown-item>
+          </b-dropdown>
+        </div>
+      </nav>
+    </div>
+    <div class="chat-box-messages">
+      <div v-for="(message, index) in visibleMessages" class='chat-box-row' v-if='messageVisible(message)' :key="index">
+        <control-event v-if="message.isControlEvent()" :message="message"></control-event>
+        <debug-message v-if="message.isDebug()" :message="message"></debug-message>
+        <reactor-message v-if="message.isReactor()" :data="message.data"></reactor-message>
+        <message-header-user v-if="!message.isFromUser() && messageFirstInSeq(index, message)" :message="message"></message-header-user>
+        <message-bubble v-if="message.isDialog()" :message='message' :show='message.ready'></message-bubble>
+      </div>
+    </div>
+    <div class="chat-box-input no-margin">
+      <input class="input" @keyup.enter="sendMessageFromInput" placeholder="Type your message here" :disabled="!inputEnabled()">
+    </div>
+   </div>
+  </script>
+
+  <div v-cloak id="workspace" :class="theme">
+    <div id="tools1" class="workspace-tool">
+    </div>
+
+    <chat-box id="main-chat-box" v-cloak :messages="messages" :conversation="conversation" :title="title" :icon="icon" :messages="messages" :active="active"
+      :show-curr-context="showCurrentContext">
+    </chat-box>
+
+    <div id="tools2" class="workspace-tool">
+      <context-box v-cloak id="curr-context" title='Current Context' :context="currentContext" v-show.sync='showCurrentContext'></context-box>
+    </div>
+  </div>
+  <script src="chat-box.js"></script>
+  <script src="frontend.js"></script>
+</body>
+
+</html>

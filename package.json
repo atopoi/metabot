@@ -1,0 +1,42 @@
+{
+  "name": "metabot",
+  "description": "Compositional task oriented chatbot language and engine",
+  "license": "UNLICENSED",
+  "version": "0.0.1",
+  "dependencies": {
+    "@slack/client": "^4.3.1",
+    "axios": "~0.18.0",
+    "body-parser": "^1.18.3",
+    "bunyan": "^1.8.12",
+    "chalk": "~2.4.1",
+    "dotenv": "~6.0.0",
+    "express": "^4.16.3",
+    "express-ws": "^4.0.0",
+    "immutable": "~3.8.2",
+    "jstransformer-cdata-js": "^1.0.0",
+    "lodash": "~4.17.10",
+    "logform": "^1.9.1",
+    "object-path-immutable": "~3.0.0",
+    "pug": "~2.0.3",
+    "table": "~4.0.3",
+    "minimist": "~1.2.0",
+    "uuid": "^3.3.2",
+    "ws": "^5.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.12.0",
+    "jest": "~23.4.2"
+  },
+  "scripts": {
+    "lint": "eslint **/*.js --fix",
+    "lint-test": "eslint **/*.js",
+    "test": "jest",
+    "launch": "node scripts/launcher.js",
+    "create-bot": "node scripts/create-bot.js",
+    "simple-bot": "node scripts/launcher.js -Dlauncher.bot=simple-demo",
+    "banking-bot": "node scripts/launcher.js -Dlauncher.bot=banking-demo",
+    "list-navigation-bot": "nodemon scripts/launcher.js -Dlauncher.bot=list-navigation"
+  }
+}

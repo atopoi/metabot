@@ -1,0 +1,415 @@
+/*
+ * Copyright 2019 Nu Echo Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+:root {
+  --light-blue: #ccdaec;
+  --yellow: #fcfcbf;
+  --yellow-d: #ffd987;
+  --orange: #fbc89e;
+  --orange-d: #f99d4f;
+  --purple: #7957d5;
+  --bot-name-color: #675dd8;
+  --white-gray: #f2f2f2;
+  --light-gray: #eceff1;
+  --dark-gray: #3e3e3e;
+}
+
+.chat-box {
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.chat-box-header {
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+  padding: 10;
+  background-color: var(--light-gray);
+  border-radius: 4px 4px 0px 0px;
+  border-bottom: 1px solid lightgray;
+}
+
+.chat-box-header a.chat-box-menu {
+  color: var(--purple);
+}
+
+.chat-box-messages {
+  padding: 5 0 10 0;
+  overflow-y: scroll;
+  word-wrap: break-word;
+  flex-grow: 1;
+}
+
+.chat-box-messages .chat-text {
+  padding: 0.4em 0.7em 0.4em 0.8em;
+  text-align: left;
+  line-height: 1.5em;
+}
+
+.chat-box-messages .chat-text p {
+  -webkit-margin-before: 0em;
+  -webkit-margin-after: 0em;
+}
+
+.chat-box-messages .chat-text img {
+  max-width: 100%;
+}
+
+.chat-box-messages .chat-text-key {
+  color: gray;
+  font-size:smaller;
+  line-height: 1.2em;
+}
+
+.hide-message-keys .chat-text-key {
+  display: none !important;
+}
+
+
+.chat-box-messages .chat-box-user-header {
+  padding: 0.3em 0.1em 0em 0.4em;
+  font-weight: bolder;
+  line-height: 1.5em;
+  color: var(--bot-name-color);
+  margin-right: 0em;
+  margin-left: auto;
+}
+
+.chat-box-messages .chat-bubble {
+  border-radius: 15px;
+  margin: 5px 5px 10px 10px;
+  width: fit-content;
+  min-width: 3em;
+  max-width: 60%;
+}
+
+.chat-box-messages .chat-bubble.left {
+  background-color: var(--light-gray);
+  color: var(--dark-gray);
+}
+
+.chat-box-messages .chat-bubble.right {
+  background-color: var(--light-blue);
+  color: var(--dark-gray);
+  margin-left: auto;
+}
+
+.chat-box-messages .chat-bubble-user-icon {
+  font-size: x-large;
+  font-weight: normal;
+  color: var(--deep-blue);
+}
+
+.chat-box-messages .event-flag {
+  border: 1px solid;
+  border-left-width: 3px;
+  padding: 0 5;
+  font-size: smaller;
+  white-space: nowrap;
+  word-break: break-word;
+}
+
+.chat-box-messages .event-flag.react-info{
+  white-space: normal;
+}
+
+.chat-box-messages .runtime-op,
+.chat-box-messages .react-label {
+  color: white;
+  padding: 0 5 0 8;
+  font-weight: bold;
+}
+
+.chat-box-messages .runtime-event,
+.chat-box-messages .reactor-event {
+  margin: 0.2em 0em 0em 0em;
+  color: #585858
+}
+
+.chat-box-messages .control-event > div {
+  background-color: var(--purple);
+  border-color: var(--purple);
+  color: white;
+}
+
+.chat-box-messages .runtime-event > .event-flag {
+  background-color: var(--yellow);
+  border-color: var(--yellow-d);
+  min-width: 4.5em;
+}
+
+.chat-box-messages .runtime-event > .runtime-tag {
+  min-width: 4em;
+}
+
+.chat-box-messages .runtime-event > .runtime-op {
+  background-color: var(--yellow-d);
+  min-width: 5.5em;
+}
+
+.chat-box-messages .reactor-event > .event-flag {
+  background-color: var(--orange);
+  border-color: var(--orange-d);
+  min-width: 4em;
+}
+
+.chat-box-messages .reactor-event > .react-label {
+  background-color: var(--orange-d);
+  min-width: 5.5em;
+}
+
+.chat-box-messages .reactor-event > .react-reactor.succeeded {
+  background-color: red;
+  border-color: red;
+  color: white;
+  font-weight: bold;
+  min-width: 5.5em;
+}
+
+.chat-box-row {
+  /* clear: both; */
+}
+
+.chat-box-input {
+  width: 100%;
+}
+
+.chat-box-input input {
+  height: 3em;
+  width: 100%;
+}
+
+
+
+#main-chat-box {
+  width: 600px;
+  min-width: 400px;
+  max-width: 600px;
+  background-color: white;
+  height: 100%;
+  border: 1px solid lightgray;
+  border-radius: 4px 4px 0px 0px;
+}
+
+#workspace {
+  display: flex;
+  height:  100%;
+}
+
+.workspace-tool {
+  flex-basis: 0;
+  flex-grow: 1;
+  flex-shrink: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white-gray);
+}
+
+
+/*=============================
+ *  transitions
+ *=============================*/
+
+.message-enter-active, .message-leave-active {
+  transition: all 0.5s;
+}
+
+.message-enter, .message-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+
+/*=============================
+ *  context-box
+ *=============================*/
+
+.context-box {
+  width: 30em;
+  min-width: 20em;
+  max-width: 35em;
+}
+
+.context-box .message-body {
+  padding: 0.8em 0;
+  font-size: smaller;
+}
+
+.context-box-row {
+  padding: 2 2 2 0;
+  overflow-x: hidden;
+  text-overflow: clip;
+  white-space: nowrap;
+  line-height: 1.4em;
+}
+
+.context-box-row.has-children {
+  cursor: pointer;
+}
+
+.context-box-key {
+  font-weight: bold;
+  min-width: 10em;
+  padding-right: 4;
+}
+
+.context-box-row-bullet {
+  font-family: monospace;
+  font-size: smaller;
+  color: gray;
+  width: 1em;
+  padding: 2 2 0 2;
+  margin-right: 2;
+}
+
+.context-box-children {
+  margin-left: 1em;
+}
+
+.context-value {
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  color: #6f6f6f;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  justify-content: center;
+}
+
+.context-value .context-value-field {
+  border-radius: 4px;
+  padding: 0 5;
+}
+
+.context-value .context-value--state-button {
+  cursor: pointer;
+  background-color: antiquewhite;
+  border-radius: 50%;
+  color: orangered;
+  font-weight: bold;
+}
+
+.context-value .context-value--state-button.state-empty {
+  color: darksalmon;
+  font-weight: normal;
+}
+
+.context-value .field-icon {
+  padding: 0 2;
+  border-radius: 50%;
+  font-size: 1em;
+  color: var(--dark-gray);
+  line-height: 1.3em;
+  background-color: var(--light-blue);
+  min-width: 1.4em;
+  width: 1.4em;
+  height: 1.4em;
+  text-align: center;
+  display: inline-block;
+}
+
+
+.theme--dev .context-value .field-icon {
+  background-color: unset;
+  border: 1px solid #e0e0e0;
+}
+
+
+.is-reactor > .context-value .field-icon {
+  background-color: var(--orange);
+}
+
+.context-value .field-action .field-icon {
+  background-color: unset;
+}
+
+.context-value .field-id {
+  display: none;
+  background-color: #d2d2d296;
+  font-size: smaller;
+  min-width: 2.5em;
+  text-align: center;
+  margin-right: 5px;
+}
+
+
+.theme--dev .context-value .field-id {
+  display: inline;
+}
+
+.context-value .field-name {
+  color: #3e3e3e;
+}
+
+.context-value .field-owner {
+  color: #908e8e;
+  font-size: small;
+}
+
+.context-value .field-owner:before {
+  content: "<";
+}
+
+.context-value .field-action {
+  background-color: #d2d2d296;
+  font-size: small;
+}
+
+.context-value .field-action:before {
+  content: "⤑";
+}
+
+.context-box .state-tree {
+  margin-left: 3em;
+  border: 1px solid wheat;
+  background-color: var(--yellow);
+  padding: 4 3 3 3;
+  border-radius: 2px;
+  width: fit-content;
+}
+
+.context-box .tree-node--item {
+  display: flex;
+  align-items: baseline;
+  line-height: 1em;
+}
+
+
+.context-box .tree-node--key {
+  margin-right: 0.5em;
+}
+
+
+.context-box .tree-node--children {
+  margin-left: 1em;
+}
+
+.context-box .tree-node--value {
+  font-family: monospace;
+  padding: 3 4 2 5;
+  color: black;
+  background-color: wheat;
+  border: 1px solid white;
+  margin-left: auto;
+}
+
+.context-box-row .task-indent {
+  color: lightsteelblue;
+  font-size: smaller;
+}
