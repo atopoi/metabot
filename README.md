@@ -101,9 +101,9 @@ GreatBot.tasks.main = DO(
 Here is a simple help method:
 ```javascript
 const showHelp = DO(
-   say('I\'m just a simple bot')
-    IF(GET('user.name'),
-       name => say('But you can help me become great, #{name}!', {name}))
+   say('I\'m just a simple bot'),
+   IF(GET('user.name'),
+   name => say('But you can help me become great, #{name}!', {name}))
 )
 ```
 
@@ -114,7 +114,7 @@ const MainActionLoop = DO(
    loop(
        DO(
         say('Rolling...'),
-        guess(Math.floor(Math.random() * 6)),
+        guess(Math.floor(Math.random() * 6))
        )
    ))
 
@@ -122,8 +122,8 @@ const guess = targetNumber => DO(
     ask({
          messages: ['Guess the result!', 'Enter a number between 1 and 6'],
          type: 'int'
-        })
-    guess => IF(guess === targetNumber
+        }),
+    guess => IF(guess === targetNumber,
       say('Yes, got it!'),
       say(`The number was ${targetNumber}!`)
       ))
