@@ -21,6 +21,7 @@ const Slot = require('./slot.js')
 const { DataFrameDef } = require('./dataframe-def.js')
 const { Reactor } = require('../reactor.js')
 const { say } = require('../lang.js')
+const { toValue } = require('../entity.js')
 
 
 const slotActionRequestVerbs = ['set', 'reset', 'showchoices', 'show']
@@ -229,7 +230,7 @@ class DataFrame {
       res = this.getSlotValue(slotName)
       console.log('DF', 'show', slotName, res)
       // TODO: link to Action instead of calling it inline
-      return say(`The current value of ${slotName} is: **${res}**`)
+      return say(`The current value of ${slotName} is: ${toValue(res)}`)
     default:
     }
     return say(`Unexpected dataframe request ${request}`)

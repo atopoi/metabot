@@ -214,7 +214,7 @@ Vue.component('context-box', {
 <article class="message is-light context-box" v-show="show" style="border: 1px solid silver;">
   <div class="message-header">
     {{title}}
-    <button class="delete" @click="show=!show"></button>
+    <button class="delete" @click="$emit('close')"></button>
   </div>
   <div v-cloak class="message-body">
     <context-box-element name="agent"      :value="context.agent"/>
@@ -365,7 +365,7 @@ Vue.component('context-value', {
       <span v-if="!stateExpanded() && !stateEmpty()">{{state}}</span>
     </div>
     <div v-if="value.action" class="context-value-field field-action" :title="JSON.stringify(value.action, null, 2)">
-      <span v-if="value.action.info" class="field-name">{{substr(value.action.info)}}</span>
+      <span v-if="value.action.info" class="field-name">{{substr(value.action.info, 40)}}</span>
       <span v-else> {{substr(JSON.stringify(value.action || ''), 20)}}</span>
     </div>
   </div>
@@ -409,7 +409,11 @@ Vue.component('tree-node', {
     },
     formatedValue() {
       // simple version, could become more elaborate
-      return this.isEntity() ? this.val.val : this.isLeaf() && this.val
+      const val = this.isEntity() ? this.val.val : this.val
+      // show 0 and false, which are real values
+      if (val === 0 || val === false) return String(val)
+      if (!val) return ' '
+      return typeof val === 'object' ? JSON.stringify(val) : val
     }
   },
 
@@ -418,7 +422,7 @@ Vue.component('tree-node', {
   <div class="tree-node--item" @click.stop="expanded=!expanded">
     <span class="context-box-row-bullet">{{isLeaf() ? '&nbsp;' : expanded ? '▼' : '▶'}}</span>
     <span class="tree-node--key">{{ name }}</span>
-    <span v-if="isLeaf()" class="tree-node--value" :title="JSON.stringify(val, null, 2)">{{ formatedValue() || '&nbsp;' }}</span>
+    <span v-if="isLeaf()" class="tree-node--value" :title="JSON.stringify(val, null, 2)">{{ formatedValue() }}</span>
   </div>
   <div v-if="isTree()" v-show="expanded" class="tree-node--children">
     <tree-node v-for="(v, key) in val" :key="key" :name="key" :val="v" :expand="expand > 0 ? expand - 1 : 0">
@@ -481,13 +485,14 @@ Vue.component('chat-box', {
       return false
     },
 
+    // Show the speaker header above the first bot bubble of a turn,
+    // ignoring the debug/control rows in between
     messageFirstInSeq(index, message) {
-      if (index === 0) return true
-      // if (!message.isDialog()) return false
-
-      const prev = this.visibleMessages[index - 1]
-      return message.direction !== prev.direction
-        || (message.agent && message.agent.name !== prev.agent.name)
+      if (!message.isDialog()) return false
+      const prev = _.findLast(this.visibleMessages.slice(0, index), m => m.isDialog())
+      if (!prev) return true
+      const agentName = m => m.agent && m.agent.name
+      return message.direction !== prev.direction || agentName(message) !== agentName(prev)
     },
 
     toggleDebug() {
@@ -507,7 +512,14 @@ Vue.component('chat-box', {
       const text = event.target.value.trim()
       // eslint-disable-next-line no-param-reassign
       event.target.value = ''
-      sendUserMessage({ text })
+      if (text) sendUserMessage({ text })
+    }
+  },
+
+  watch: {
+    // put the cursor in the input as soon as the conversation accepts input
+    active(value) {
+      if (value) this.$nextTick(() => this.$el.querySelector('.chat-box-input input').focus())
     }
   },
 

@@ -19,14 +19,12 @@ limitations under the License.
   <meta name="viewport" content="width=device-width">
   <title>Metabot</title>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
   <!-- vue -->
   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-  <!-- Buefy CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
-  <!-- Buefy JavaScript -->
-  <script src="https://unpkg.com/buefy"></script>
+  <!-- Buefy: pinned to the last release line supporting Vue 2.5 (unpinned now resolves to the Vue 3 build) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/buefy@0.7.10/dist/buefy.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/buefy@0.7.10/dist/buefy.min.js"></script>
   <link rel="stylesheet" href="app.css">
 </head>
 
@@ -47,6 +45,9 @@ limitations under the License.
           <a class="level-item is-small" @click="startOrStop()">
             <i class="far fa-play-circle" v-if="!conversationStarted" />
             <i class="far fa-stop-circle" v-if="conversationStarted" />
+          </a>
+          <a class="level-item is-small chat-box-menu" @click="$root.showCurrentContext = !$root.showCurrentContext" title="Show/hide the context panel">
+            <i class="fas fa-sitemap"/>
           </a>
           <a class="level-item is-small chat-box-menu" @click="toggleDebug()">
             <i class="far fa-eye" v-if="debug.show"/>
@@ -84,7 +85,7 @@ limitations under the License.
       </nav>
     </div>
     <div class="chat-box-messages">
-      <div v-for="(message, index) in visibleMessages" class='chat-box-row' v-if='messageVisible(message)' :key="index">
+      <div v-for="(message, index) in visibleMessages" class='chat-box-row' :key="index">
         <control-event v-if="message.isControlEvent()" :message="message"></control-event>
         <debug-message v-if="message.isDebug()" :message="message"></debug-message>
         <reactor-message v-if="message.isReactor()" :data="message.data"></reactor-message>
@@ -102,12 +103,12 @@ limitations under the License.
     <div id="tools1" class="workspace-tool">
     </div>
 
-    <chat-box id="main-chat-box" v-cloak :messages="messages" :conversation="conversation" :title="title" :icon="icon" :messages="messages" :active="active"
+    <chat-box id="main-chat-box" v-cloak :messages="messages" :conversation="conversation" :title="title" :icon="icon" :active="active"
       :show-curr-context="showCurrentContext">
     </chat-box>
 
     <div id="tools2" class="workspace-tool">
-      <context-box v-cloak id="curr-context" title='Current Context' :context="currentContext" v-show.sync='showCurrentContext'></context-box>
+      <context-box v-cloak id="curr-context" title='Current Context' :context="currentContext" :show="showCurrentContext" @close="showCurrentContext = false"></context-box>
     </div>
   </div>
   <script src="chat-box.js"></script>

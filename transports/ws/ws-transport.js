@@ -63,7 +63,7 @@ class Connection {
   }
 
   isObserving() {
-    return this.observing === ConnectionMode.observing
+    return this.mode === ConnectionMode.observing
   }
 
   send(message) {
@@ -101,15 +101,20 @@ class WebSocketTransport extends BaseTransport {
       log.info('Generated ID %s.', id)
 
       ws.on('message', data => {
-        const message = JSON.parse(data)
-        if (message.type === 'start') {
-          this.startConversation(connection)
-        } else if (message.type === 'stop') {
-          this.stopConversation(connection, message.id)
-        } else if (message.type === 'userUtterance') {
-          this.processUserMessage({ id, ...message })
-        } else {
-          log.warn('websocket message type not supported: %s', message.type)
+        // An exception here would take down the whole server (and every conversation)
+        try {
+          const message = JSON.parse(data)
+          if (message.type === 'start') {
+            this.startConversation(connection)
+          } else if (message.type === 'stop') {
+            this.stopConversation(connection, message.id)
+          } else if (message.type === 'userUtterance') {
+            this.processUserMessage({ id, ...message })
+          } else {
+            log.warn('websocket message type not supported: %s', message.type)
+          }
+        } catch (error) {
+          log.error('Error processing websocket message %s: %s', data, error.stack)
         }
       })
       ws.on('close', () => {
@@ -133,10 +138,17 @@ class WebSocketTransport extends BaseTransport {
   }
 
   startConversation(connection) {
+    // Restarting replaces the running conversation instead of leaving it orphaned
+    if (connection.isConversationAttached() && connection.mode === ConnectionMode.controlling) {
+      connection.conversation.stop()
+    }
     this.createConversation(connection.id)
   }
 
   stopConversation(connection, id) {
+    // Already stopped (double click, session timeout, ...)
+    if (!connection.isConversationAttached()) return
+
     if (id === connection.id) {
       connection.conversation.stop()
     } else {

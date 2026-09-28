@@ -26,6 +26,7 @@ const opi = require('object-path-immutable')
 
 const EventEmitter = require('events')
 const Context = require('./context')
+const log = require('./logging')
 const { localizeText, resolveText } = require('./localize.js')
 const { Mailbox } = require('./event-utils/mailbox')
 const {
@@ -271,12 +272,20 @@ Metabot.start = (bot, conversation) => {
   conversation.start(bot)
   // TODO: this should work!
   // controlEvent(ctx, 'botStarted',{bot, messages: bot.messages, intents:describeIntentsCatalog()})
-  bot.run(ctx)
+
+  // When the bot's main task is over, so is the conversation
+  // (otherwise the client keeps accepting input that nothing will read)
+  Promise.resolve(bot.run(ctx))
+    .catch(error => log.error('Bot run failed: %s', error.stack))
+    .then(() => {
+      if (conversation.bot === bot) Metabot.stop(conversation)
+    })
 }
 
 
 Metabot.stop = conversation => {
-  conversation.stop()
+  // may already be over (bot finished, timeout, ...)
+  if (conversation) conversation.stop()
 }
 
 
